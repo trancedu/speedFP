@@ -5,6 +5,7 @@ public:
     virtual ~Data() = default;
     virtual double calculatePrice() const = 0;
     virtual double getCommonFactor() const { return commonFactor; }
+    virtual bool isStock() const = 0;
 protected:
     double commonFactor = 0.5;
 };
@@ -13,6 +14,7 @@ class StockData : public Data {
 public:
     StockData() : priceFactor(1.2) {}
     double calculatePrice() const override { return priceFactor * 1.1 + getCommonFactor(); }
+    bool isStock() const override { return true; }
 private:
     double priceFactor;
 };
@@ -21,6 +23,7 @@ class OptionData : public Data {
 public:
     OptionData() : volatility(0.8) {}
     double calculatePrice() const override { return volatility * 2.5 + getCommonFactor(); }
+    bool isStock() const override { return false; }
 private:
     double volatility;
 };
@@ -33,13 +36,13 @@ public:
 class DynamicPricer : public Pricer {
 public:
     double calculatePrice(const Data* data) const override {
-        if (auto* stock = dynamic_cast<const StockData*>(data)) {
+        if (data->isStock()) {
+            auto* stock = dynamic_cast<const StockData*>(data);
             return stock->calculatePrice();
-        }
-        if (auto* option = dynamic_cast<const OptionData*>(data)) {
+        } else {
+            auto* option = dynamic_cast<const OptionData*>(data);
             return option->calculatePrice();
         }
-        return 0.0;
     }
 };
 

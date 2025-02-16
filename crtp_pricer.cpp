@@ -51,6 +51,20 @@ private:
     double volatility;
 };
 
+class StockPricer : public Pricer<StockData> {
+public:
+    double calculatePrice(const StockData& data) const {
+        return data.getPriceFactor() * 1.1 + data.getCommonFactor();
+    }
+};
+
+class OptionPricer : public Pricer<OptionData> {
+public:
+    double calculatePrice(const OptionData& data) const {
+        return data.getVolatility() * 2.5 + data.getCommonFactor();
+    }
+};
+
 using DataVariant = std::variant<StockData, OptionData>;
 
 
