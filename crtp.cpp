@@ -43,7 +43,7 @@ int main() {
         dataSamples.emplace_back(OptionData{});
     }
     
-    benchmark("Design 6: CRTP with variant", [&]() {
+    benchmark("Design: CRTP with variant", [&]() {
         for (const auto& var : dataSamples) {
             std::visit([](const auto& data) {
                 data.calculatePrice();

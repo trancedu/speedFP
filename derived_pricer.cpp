@@ -6,8 +6,8 @@ class OptionPricer;
 class Data {
 public:
     virtual ~Data() = default;
-    virtual double getCommonFactor() const { return commonFactor; }
     virtual double calculatePrice() const = 0;
+    virtual double getCommonFactor() const { return commonFactor; }
 protected:
     double commonFactor = 0.5;
 };
@@ -28,24 +28,17 @@ public:
     double volatility;
 };
 
-class Pricer {
+class StockPricer {
 public:
-    virtual double calculatePrice(const Data* data) const = 0;
-};
-
-class StockPricer : public Pricer {
-public:
-    double calculatePrice(const Data* data) const override { 
-        auto* stock = static_cast<const StockData*>(data);
-        return stock->priceFactor * 1.1 + stock->getCommonFactor();
+    double calculatePrice(const StockData* data) const { 
+        return data->priceFactor * 1.1 + data->getCommonFactor();
     }
 };
 
-class OptionPricer : public Pricer {
+class OptionPricer {
 public:
-    double calculatePrice(const Data* data) const override { 
-        auto* option = static_cast<const OptionData*>(data);
-        return option->volatility * 2.5 + option->getCommonFactor();
+    double calculatePrice(const OptionData* data) const { 
+        return data->volatility * 2.5 + data->getCommonFactor();
     }
 };
 
@@ -62,7 +55,7 @@ int main() {
         dataSamples.emplace_back(std::make_unique<OptionData>(&optionPricer));
     }
     
-    benchmark("Design 8: Static cast in subpricer", [&]() {
+    benchmark("Design: Derived pricer with Pricer", [&]() {
         for (const auto& data : dataSamples) {
             data->calculatePrice();
         }

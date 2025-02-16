@@ -46,7 +46,7 @@ int main() {
         dataSamples.emplace_back(std::make_unique<OptionData>(&pricer));
     }
     
-    benchmark("Design 9: Virtual with Pricer", [&]() {
+    benchmark("Design: Virtual Function with Pricer", [&]() {
         for (const auto& data : dataSamples) {
             data->calculatePriceImpl();
         }

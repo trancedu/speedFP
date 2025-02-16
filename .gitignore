@@ -2,4 +2,9 @@
 build/
 a.out
 *.out
+*.o
+*.a
+*.so
+*.dylib
+.DS_Store
 output/

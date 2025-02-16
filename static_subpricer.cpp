@@ -36,20 +36,16 @@ public:
 class StockPricer : public Pricer {
 public:
     double calculatePrice(const Data* data) const override { 
-        if (auto* stock = dynamic_cast<const StockData*>(data)) {
-            return stock->priceFactor * 1.1 + stock->getCommonFactor();
-        }
-        return 0.0;
+        auto* stock = static_cast<const StockData*>(data);
+        return stock->priceFactor * 1.1 + stock->getCommonFactor();
     }
 };
 
 class OptionPricer : public Pricer {
 public:
     double calculatePrice(const Data* data) const override { 
-        if (auto* option = dynamic_cast<const OptionData*>(data)) {
-            return option->volatility * 2.5 + option->getCommonFactor();
-        }
-        return 0.0;
+        auto* option = static_cast<const OptionData*>(data);
+        return option->volatility * 2.5 + option->getCommonFactor();
     }
 };
 
@@ -66,7 +62,7 @@ int main() {
         dataSamples.emplace_back(std::make_unique<OptionData>(&optionPricer));
     }
     
-    benchmark("Design 7: Dynamic cast in subpricer", [&]() {
+    benchmark("Design: Static cast in subpricer", [&]() {
         for (const auto& data : dataSamples) {
             data->calculatePrice();
         }

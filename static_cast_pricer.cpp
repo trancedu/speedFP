@@ -41,7 +41,7 @@ int main() {
         dataSamples.emplace_back(std::make_unique<OptionData>());
     }
     
-    benchmark("Design 3: Static cast with Pricer", [&]() {
+    benchmark("Design: Static cast with Pricer", [&]() {
         for (const auto& data : dataSamples) {
             pricer.calculatePrice(data.get());
         }

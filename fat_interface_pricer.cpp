@@ -62,7 +62,7 @@ int main() {
         dataSamples.emplace_back(std::make_unique<OptionData>(&optionPricer));
     }
     
-    benchmark("Design 10: Fat Interface with Pricer", [&]() {
+    benchmark("Design: Fat Interface with Pricer", [&]() {
         for (const auto& data : dataSamples) {
             data->calculatePriceImpl();
         }

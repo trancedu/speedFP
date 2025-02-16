@@ -63,7 +63,7 @@ int main() {
         dataSamples.emplace_back(OptionData(&optionPricer));
     }
     
-    benchmark("Design 11: CRTP with Pricer", [&]() {
+    benchmark("Design: CRTP with Pricer", [&]() {
         for (const auto& var : dataSamples) {
             std::visit([&](const auto& data) {
                 data.calculatePriceOutside();

@@ -3,10 +3,8 @@
 class Data {
 public:
     virtual ~Data() = default;
-    virtual double getPrice() const = 0;
+    virtual double calculatePrice() const = 0;
     virtual double getCommonFactor() const { return commonFactor; }
-    virtual double getPriceFactor() const { return 0; }
-    virtual double getVolatility() const { return 0; }
 protected:
     double commonFactor = 0.5;
 };
@@ -14,8 +12,7 @@ protected:
 class StockData : public Data {
 public:
     StockData() : priceFactor(1.2) {}
-    double getPrice() const override { return priceFactor * 1.1 + getCommonFactor(); }
-    double getPriceFactor() const override { return priceFactor; }
+    double calculatePrice() const override { return priceFactor * 1.1 + getCommonFactor(); }
 private:
     double priceFactor;
 };
@@ -23,8 +20,7 @@ private:
 class OptionData : public Data {
 public:
     OptionData() : volatility(0.8) {}
-    double getPrice() const override { return volatility * 2.5 + getCommonFactor(); }
-    double getVolatility() const override { return volatility; }
+    double calculatePrice() const override { return volatility * 2.5 + getCommonFactor(); }
 private:
     double volatility;
 };
@@ -36,9 +32,9 @@ int main() {
         dataSamples.emplace_back(std::make_unique<OptionData>());
     }
     
-    benchmark("Design 5: Fat interface Virtual", [&]() {
+    benchmark("Design: Virtual function", [&]() {
         for (const auto& data : dataSamples) {
-            data->getPrice();
+            data->calculatePrice();
         }
     }, ITERATIONS);
 

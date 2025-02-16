@@ -1,0 +1,18 @@
+#!/bin/bash
+
+# Build first
+mkdir -p build && cd build
+cmake .. && make -j$(nproc)
+
+# Run in specified order
+./virtual_function
+./virtual_pricer
+./fat_interface
+./fat_interface_pricer
+./crtp
+./crtp_pricer
+./derived_pricer
+./dynamic_cast_pricer
+./static_cast_pricer
+./dynamic_subpricer
+./static_subpricer 
