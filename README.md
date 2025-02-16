@@ -24,6 +24,61 @@ The `Data` class serves as a base class holding common data for both `StockData`
 ### Pricer Class
 The `Pricer` class is designed to take a pointer to a `Data` class object, which could be either a base or derived class. The `OptionPricer` and `StockPricer` classes inherit from `Pricer` and implement specific pricing logic for options and stocks, respectively.
 
+## UML Class Diagram in general 
+Note: Code in some files have some differences, for example the pricer may call derived Data pointer, or the pricer is a derived pointer, etc.
+
+```plaintext
++------------------+
+|      Data        |
++------------------+
+| - commonFactor   |
+| - pricer         |
++------------------+
+       ^
+       |
++------------------+   +------------------+
+|   StockData      |   |   OptionData     |
++------------------+   +------------------+
+| - priceFactor    |   | - volatility     |
++------------------+   +------------------+
+       
++------------------+
+|     Pricer       |
++------------------+
+| + calculatePrice(Data*) |
++------------------+
+       ^
+       |
++------------------+   +------------------+
+|   StockPricer    |   |   OptionPricer   |
++------------------+   +------------------+
+|                  |   |                  |
++------------------+   +------------------+
+```
+
+### Key Points
+
+- **Data**: 
+  - Base class with data members `commonFactor` and `pricer`.
+  - Inherited by `StockData` and `OptionData`.
+
+- **StockData**:
+  - Inherits from `Data` and includes the data member `priceFactor`.
+
+- **OptionData**:
+  - Inherits from `Data` and includes the data member `volatility`.
+
+- **Pricer**:
+  - Base class with the method `calculatePrice(Data*)`.
+  - Inherited by `StockPricer` and `OptionPricer`.
+
+- **StockPricer** and **OptionPricer**:
+  - Both inherit from `Pricer`.
+
+This diagram now includes the `calculatePrice(Data*)` method in the `Pricer` class, along with the specified data members.
+### Different Designs in the code
+Note, some designs in the code are different, for example they may use derived pricer pointer, or the pricer calls derived Data pointer, the UML is just a general idea of the inheritance hierarchy.
+
 ## How to Run
 
 ### Windows (MSVC)
