@@ -175,8 +175,8 @@ int main() {
         }
     }, iterations);
 
-    // Benchmark Design 4: Calling Pricer inside Data
-    benchmark("Design 4: Calling Pricer inside Data", [&]() {
+    // Benchmark Design 4: Calling Derived Pricer inside Derived Data
+    benchmark("Design 4: Calling Derived Pricer inside Derived Data", [&]() {
         for (const auto& data : dataSamples) {
             data->calculatePriceDerived();
         }
