@@ -137,7 +137,7 @@ double OptionPricer::calculatePriceFat(const Data* data) const {
 }
 
 int main() {
-    constexpr size_t iterations = 1'000'000;
+    constexpr size_t iterations = 10'000;
     std::vector<std::unique_ptr<Data>> dataSamples;
     std::vector<std::unique_ptr<Pricer>> pricers;
 
