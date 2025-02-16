@@ -4,9 +4,41 @@
 #include <memory>
 #include <random>
 
+// Add forward declaration for Data before Pricer
+class Data;
+
 class StockPricer;
 class OptionPricer;
 class Pricer;
+
+// Base Pricer class for Designs 2-5
+class Pricer {
+public:
+    virtual ~Pricer() = default;
+    virtual double calculatePriceBaseDynamic(const Data* data) const = 0;
+    virtual double calculatePriceBaseStatic(const Data* data) const = 0;
+    virtual double calculatePriceFat(const Data* data) const = 0;
+};
+
+// Forward declarations for derived data classes
+class StockData;
+class OptionData;
+
+class StockPricer : public Pricer {
+public:
+    double calculatePrice(const StockData* stock) const;
+    double calculatePriceBaseDynamic(const Data* data) const override;
+    double calculatePriceBaseStatic(const Data* data) const override;
+    double calculatePriceFat(const Data* data) const override;
+};
+
+class OptionPricer : public Pricer {
+public:
+    double calculatePrice(const OptionData* option) const;
+    double calculatePriceBaseDynamic(const Data* data) const override;
+    double calculatePriceBaseStatic(const Data* data) const override; 
+    double calculatePriceFat(const Data* data) const override;
+};
 
 // Base data class
 class Data {
@@ -53,50 +85,6 @@ public:
     OptionPricer* optionPricer;
 };
 
-// Base Pricer class for Designs 2-5
-class Pricer {
-public:
-    virtual ~Pricer() = default;
-    virtual double calculatePriceBaseDynamic(const Data* data) const = 0;
-    virtual double calculatePriceBaseStatic(const Data* data) const = 0;
-    virtual double calculatePriceFat(const Data* data) const = 0;
-};
-
-class StockPricer : public Pricer {
-public:
-    double calculatePrice(const StockData* stock) const { return stock->priceFactor * 1.1 + stock->getCommonFactor(); }
-    double calculatePriceBaseDynamic(const Data* data) const override { 
-        if (auto* stock = dynamic_cast<const StockData*>(data)) {
-            return stock->priceFactor * 1.1 + stock->getCommonFactor();
-        }
-        return 0.0;
-    }
-    double calculatePriceBaseStatic(const Data* data) const override { 
-        return static_cast<const StockData*>(data)->priceFactor * 1.1 + data->getCommonFactor();
-    }
-    double calculatePriceFat(const Data* data) const override {
-        return data->getPriceFactor() * 1.1 + data->getCommonFactor();
-    }
-};
-
-class OptionPricer : public Pricer {
-public:
-    double calculatePrice(const OptionData* option) const { return option->volatility * 2.5 + option->getCommonFactor(); }
-    double calculatePriceBaseDynamic(const Data* data) const override { 
-        if (auto* option = dynamic_cast<const OptionData*>(data)) {
-            return option->volatility * 2.5 + option->getCommonFactor();
-        }
-        return 0.0;
-    }
-    double calculatePriceBaseStatic(const Data* data) const override { 
-        return static_cast<const OptionData*>(data)->volatility * 2.5 + data->getCommonFactor();
-    }
-    double calculatePriceFat(const Data* data) const override {
-        return data->getVolatility() * 2.5 + data->getCommonFactor();
-    }
-};
-
-
 // Benchmark function
 template <typename Func>
 void benchmark(const std::string& label, Func func, size_t iterations) {
@@ -107,6 +95,45 @@ void benchmark(const std::string& label, Func func, size_t iterations) {
     auto end = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> duration = end - start;
     std::cout << label << " took " << duration.count() << " seconds\n";
+}
+
+// Add method implementations after all classes are defined
+double StockPricer::calculatePrice(const StockData* stock) const { 
+    return stock->priceFactor * 1.1 + stock->getCommonFactor(); 
+}
+
+double StockPricer::calculatePriceBaseDynamic(const Data* data) const { 
+    if (auto* stock = dynamic_cast<const StockData*>(data)) {
+        return stock->priceFactor * 1.1 + stock->getCommonFactor();
+    }
+    return 0.0;
+}
+
+double StockPricer::calculatePriceBaseStatic(const Data* data) const { 
+    return static_cast<const StockData*>(data)->priceFactor * 1.1 + data->getCommonFactor();
+}
+
+double StockPricer::calculatePriceFat(const Data* data) const {
+    return data->getPriceFactor() * 1.1 + data->getCommonFactor();
+}
+
+double OptionPricer::calculatePrice(const OptionData* option) const { 
+    return option->volatility * 2.5 + option->getCommonFactor(); 
+}
+
+double OptionPricer::calculatePriceBaseDynamic(const Data* data) const { 
+    if (auto* option = dynamic_cast<const OptionData*>(data)) {
+        return option->volatility * 2.5 + option->getCommonFactor();
+    }
+    return 0.0;
+}
+
+double OptionPricer::calculatePriceBaseStatic(const Data* data) const { 
+    return static_cast<const OptionData*>(data)->volatility * 2.5 + data->getCommonFactor();
+}
+
+double OptionPricer::calculatePriceFat(const Data* data) const {
+    return data->getVolatility() * 2.5 + data->getCommonFactor();
 }
 
 int main() {
@@ -133,16 +160,14 @@ int main() {
     // Benchmark Design 2: Dynamic cast in Pricer
     benchmark("Design 2: Dynamic cast in Pricer", [&]() {
         for (const auto& data : dataSamples) {
-            stockPricer.calculatePriceBaseDynamic(data.get());
-            optionPricer.calculatePriceBaseDynamic(data.get());
+            data->calculatePriceBaseDynamic();
         }
     }, iterations);
 
     // Benchmark Design 3: Static cast in Pricer
     benchmark("Design 3: Static cast in Pricer", [&]() {
         for (const auto& data : dataSamples) {
-            stockPricer.calculatePriceBaseStatic(data.get());
-            optionPricer.calculatePriceBaseStatic(data.get());
+            data->calculatePriceBaseStatic();
         }
     }, iterations);
 
@@ -156,8 +181,7 @@ int main() {
     // Benchmark Design 5: Unified data members in base class
     benchmark("Design 5: Fat data members", [&]() {
         for (const auto& data : dataSamples) {
-            stockPricer.calculatePriceFat(data.get());
-            optionPricer.calculatePriceFat(data.get());
+            data->calculatePriceFat();
         }
     }, iterations);
 
