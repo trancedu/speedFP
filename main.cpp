@@ -96,7 +96,7 @@ void benchmark(const std::string& label, Func func, size_t iterations) {
     
     // Calculate duration in nanoseconds
     auto total_ns = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count();
-    double average_ns = static_cast<double>(total_ns) / iterations;
+    double average_ns = static_cast<double>(total_ns) / iterations / iterations;
     
     std::cout << label << " - Average: " << average_ns << " ns/iter\n";
 }
