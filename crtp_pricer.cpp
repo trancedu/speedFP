@@ -23,8 +23,7 @@ protected:
 template <typename Derived>
 class Pricer {
 public:
-    template <typename T>
-    double calculatePrice(const T& data) const {
+    double calculatePrice(const Derived& data) const {
         return data.calculatePrice();  // Direct call with static dispatch
     }
 };
