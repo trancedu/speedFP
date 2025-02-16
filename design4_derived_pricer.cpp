@@ -55,7 +55,7 @@ int main() {
         dataSamples.emplace_back(std::make_unique<OptionData>(&optionPricer));
     }
     
-    benchmark("Design 4: Derived pricer", [&]() {
+    benchmark("Design 4: Derived pricer with Pricer", [&]() {
         for (const auto& data : dataSamples) {
             data->calculatePrice();
         }

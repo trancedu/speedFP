@@ -36,7 +36,7 @@ int main() {
         dataSamples.emplace_back(std::make_unique<OptionData>());
     }
     
-    benchmark("Design 5: Fat interface", [&]() {
+    benchmark("Design 5: Fat interface Virtual", [&]() {
         for (const auto& data : dataSamples) {
             data->getPrice();
         }
