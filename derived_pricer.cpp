@@ -6,8 +6,8 @@ class OptionPricer;
 class Data {
 public:
     virtual ~Data() = default;
-    virtual double calculatePrice() const = 0;
-    virtual double getCommonFactor() const { return commonFactor; }
+    // virtual double calculatePrice() const = 0;
+    double getCommonFactor() const { return commonFactor; }
 protected:
     double commonFactor = 0.5;
 };
@@ -15,7 +15,7 @@ protected:
 class StockData : public Data {
 public:
     StockData(StockPricer* p) : Data(), pricer(p), priceFactor(1.2) {}
-    double calculatePrice() const override;
+    double calculatePrice() const ;
     StockPricer* pricer;
     double priceFactor;
 };
@@ -23,7 +23,7 @@ public:
 class OptionData : public Data {
 public:
     OptionData(OptionPricer* p) : Data(), pricer(p), volatility(0.8) {}
-    double calculatePrice() const override;
+    double calculatePrice() const ;
     OptionPricer* pricer;
     double volatility;
 };
@@ -45,19 +45,23 @@ public:
 double StockData::calculatePrice() const { return pricer->calculatePrice(this); }
 double OptionData::calculatePrice() const { return pricer->calculatePrice(this); }
 
+using DataVariant = std::variant<StockData, OptionData>;
+
 int main() {
     StockPricer stockPricer;
     OptionPricer optionPricer;
-    
-    std::vector<std::unique_ptr<Data>> dataSamples;
+
+    std::vector<DataVariant> dataSamples;
     for (size_t i = 0; i < SAMPLE_SIZE/2; ++i) {
-        dataSamples.emplace_back(std::make_unique<StockData>(&stockPricer));
-        dataSamples.emplace_back(std::make_unique<OptionData>(&optionPricer));
+        dataSamples.emplace_back(StockData(&stockPricer));
+        dataSamples.emplace_back(OptionData(&optionPricer));
     }
     
-    benchmark("Design: Derived pricer with Pricer", [&]() {
+    benchmark("Design: Derived pricer no virtual function", [&]() {
         for (const auto& data : dataSamples) {
-            data->calculatePrice();
+            std::visit([&](auto&& arg) {
+                arg.calculatePrice();
+            }, data);
         }
     }, ITERATIONS);
 
