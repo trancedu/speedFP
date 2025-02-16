@@ -93,8 +93,12 @@ void benchmark(const std::string& label, Func func, size_t iterations) {
         func();
     }
     auto end = std::chrono::high_resolution_clock::now();
-    std::chrono::duration<double> duration = end - start;
-    std::cout << label << " took " << duration.count() << " seconds\n";
+    
+    // Calculate duration in nanoseconds
+    auto total_ns = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count();
+    double average_ns = static_cast<double>(total_ns) / iterations;
+    
+    std::cout << label << " - Average: " << average_ns << " ns/iter\n";
 }
 
 // Add method implementations after all classes are defined
