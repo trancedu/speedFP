@@ -1,0 +1,1 @@
+Get-ChildItem -Path ".\build\Release\" -Filter "*.exe" | ForEach-Object { & $_.FullName }
