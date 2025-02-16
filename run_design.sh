@@ -6,7 +6,7 @@
 mkdir -p output
 
 # Compile all design*.cpp files, outputting them to the output directory with .out extension
-for f in design*.cpp; do 
+for f in *.cpp; do 
     clang++ -O2 -std=c++20 "$f" -o "output/${f%.cpp}.out"; 
 done
 
