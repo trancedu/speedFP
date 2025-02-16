@@ -1,4 +1,5 @@
 #include "benchmark.h"
+#include <variant>
 
 class StockPricer;
 class OptionPricer;
