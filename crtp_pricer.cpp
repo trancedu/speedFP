@@ -1,8 +1,15 @@
 #include "benchmark.h"
 #include <variant>
+#include <iostream>
+#include <vector>
 
-template <typename Derived>
-class Pricer;  // Forward declaration
+template <typename Derived, typename DataType>
+class Pricer {
+public:
+    double calculatePrice(const DataType& data) const {
+        return static_cast<const Derived*>(this)->calculatePriceImpl(data);
+    }
+};
 
 template <typename Derived>
 class Data {
@@ -11,75 +18,79 @@ public:
         return static_cast<const Derived*>(this)->calculatePriceImpl();
     }
     double getCommonFactor() const { return commonFactor; }
-    double calculatePriceOutside() const {
-        return pricer->calculatePrice(*static_cast<const Derived*>(this));
-    }
-    explicit Data(Pricer<Derived>* p) : pricer(p) {}
+
 protected:
     double commonFactor = 0.5;
-    Pricer<Derived>* pricer;
 };
 
-template <typename Derived>
-class Pricer {
-public:
-    double calculatePrice(const Derived& data) const {
-        return data.calculatePrice();  // Direct call with static dispatch
-    }
-};
+// Forward declarations
+class StockPricer;
+class OptionPricer;
 
+// Data class declarations
 class StockData : public Data<StockData> {
 public:
-    StockData(Pricer<StockData>* p) : Data<StockData>(p), priceFactor(1.2) {}
-    double calculatePriceImpl() const {
-        return priceFactor * 1.1 + getCommonFactor();
-    }
-    double getPriceFactor() const { return priceFactor; }
+    StockData(StockPricer* p);
+    double calculatePriceImpl() const;
+    double getPriceFactor() const;
 private:
     double priceFactor;
+    StockPricer* pricer;
 };
 
 class OptionData : public Data<OptionData> {
 public:
-    OptionData(Pricer<OptionData>* p) : Data<OptionData>(p), volatility(0.8) {}
-    double calculatePriceImpl() const {
-        return volatility * 2.5 + getCommonFactor();
-    }
-    double getVolatility() const { return volatility; }
+    OptionData(OptionPricer* p);
+    double calculatePriceImpl() const;
+    double getVolatility() const;
 private:
     double volatility;
+    OptionPricer* pricer;
 };
 
-class StockPricer : public Pricer<StockData> {
+// Pricer class definitions
+class StockPricer : public Pricer<StockPricer, StockData> {
 public:
-    double calculatePrice(const StockData& data) const {
+    double calculatePriceImpl(const StockData& data) const {
         return data.getPriceFactor() * 1.1 + data.getCommonFactor();
     }
 };
 
-class OptionPricer : public Pricer<OptionData> {
+class OptionPricer : public Pricer<OptionPricer, OptionData> {
 public:
-    double calculatePrice(const OptionData& data) const {
+    double calculatePriceImpl(const OptionData& data) const {
         return data.getVolatility() * 2.5 + data.getCommonFactor();
     }
 };
 
+// Data class method implementations
+StockData::StockData(StockPricer* p) : priceFactor(1.2), pricer(p) {}
+double StockData::calculatePriceImpl() const { return pricer->calculatePrice(*this); }
+double StockData::getPriceFactor() const { return priceFactor; }
+
+OptionData::OptionData(OptionPricer* p) : volatility(0.8), pricer(p) {}
+double OptionData::calculatePriceImpl() const { return pricer->calculatePrice(*this); }
+double OptionData::getVolatility() const { return volatility; }
+
 using DataVariant = std::variant<StockData, OptionData>;
 
-
 int main() {
-    Pricer<StockData> stockPricer;
-    Pricer<OptionData> optionPricer;
+    StockPricer stockPricer;
+    OptionPricer optionPricer;
     std::vector<DataVariant> dataSamples;
     for (size_t i = 0; i < SAMPLE_SIZE/2; ++i) {
         dataSamples.emplace_back(StockData(&stockPricer));
         dataSamples.emplace_back(OptionData(&optionPricer));
     }
     
+    // auto data = dataSamples[0];
+    // auto price = std::visit([](auto&& arg) -> double { return arg.calculatePrice(); }, data);
+    // std::cout << "Price: " << price << std::endl;
+
     benchmark("Design: CRTP with Pricer", [&]() {
         for (const auto& var : dataSamples) {
             std::visit([&](const auto& data) {
-                data.calculatePriceOutside();
+                data.calculatePrice();
             }, var);
         }
     }, ITERATIONS);
