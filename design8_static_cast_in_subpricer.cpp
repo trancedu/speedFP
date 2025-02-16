@@ -28,17 +28,22 @@ public:
     double volatility;
 };
 
-class StockPricer {
+class Pricer {
 public:
-    double calculatePrice(const Data* data) const { 
+    virtual double calculatePrice(const Data* data) const = 0;
+};
+
+class StockPricer : public Pricer {
+public:
+    double calculatePrice(const Data* data) const override { 
         auto* stock = static_cast<const StockData*>(data);
         return stock->priceFactor * 1.1 + stock->getCommonFactor();
     }
 };
 
-class OptionPricer {
+class OptionPricer : public Pricer {
 public:
-    double calculatePrice(const Data* data) const { 
+    double calculatePrice(const Data* data) const override { 
         auto* option = static_cast<const OptionData*>(data);
         return option->volatility * 2.5 + option->getCommonFactor();
     }
