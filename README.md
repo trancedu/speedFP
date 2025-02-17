@@ -141,17 +141,19 @@ The benchmarks test the speed of pricing on 10,000 samples with 10,000 iteration
 
 | Design Pattern                  | Clang++ O2 (ns/iter) | G++ O1 (ns/iter) | MSVC Release (ns/iter) |
 |---------------------------------|----------------------|------------------|------------------------|
-| Virtual function                | 3.46439              | 2.40862          | 2.38957                |
-| Virtual Function with Pricer    | 3.59468              | 2.68404          | 2.34695                |
-| Fat interface Virtual           | 3.55187              | 2.05151          | 2.33722                |
-| Fat Interface with Pricer       | 3.59062              | 3.28035          | 2.68001                |
-| CRTP with variant               | 1.8496               | 0.31525          | 0.322708               |
-| CRTP with Pricer                | 1.84175              | 0.31589          | 0.368556               |
-| Derived pricer no virtual function | 1.83058           | 0.4799           | 0.41089                |
-| Dynamic cast with Pricer        | 8.553               | 6.08646          | 9.86839                |
-| Static cast with Pricer         | 2.49518             | 3.01085          | 2.53508                |
-| Dynamic cast in subpricer       | 7.89511             | 4.73714          | 7.66831                |
-| Static cast in subpricer        | 3.50416             | 2.699            | 2.48798                |
+| Virtual function                | 3.47503              | 2.10989          | 2.61694                |
+| Virtual Function with Pricer    | 3.45394              | 2.7557           | 2.41203                |
+| Fat interface Virtual           | 3.4543               | 2.7318           | 2.91102                |
+| Fat Interface with Pricer       | 3.45567              | 3.35418          | 2.95541                |
+| CRTP with variant               | 1.72639              | 0.39919          | 0.40957                |
+| CRTP with Pricer                | 1.71321              | 0.37822          | 0.486885               |
+| Derived pricer no virtual function | 1.7154            | 0.36884          | 0.45207               |
+| Derived pricer with virtual used | 1.71292             | 1.78842          | 1.97573                |
+| Derived pricer with virtual unused | 1.73015           | 1.57014          | 1.94696                |
+| Dynamic cast with Pricer        | 8.553               | 6.08646          | 11.0482                |
+| Static cast with Pricer         | 2.49518             | 3.01085          | 2.63515                |
+| Dynamic cast in subpricer       | 7.89511             | 4.73714          | 8.04488                |
+| Static cast in subpricer        | 3.50416             | 2.699            | 2.92021                |
 
 This table provides a quick comparison of the performance across different platforms and optimization levels.
 
@@ -160,3 +162,4 @@ These are just my observations, I may be wrong.
 1. Virtual function has significant overhead, compared to non virtual function or CRTP.
 2. Dynamic cast has even more overhead, if possible, maintain a enum of types and use static cast.
 3. Theoretically, in Object Oriented Design, data should be bundled with the business logic, so that down casting is not needed. If you have to separate data and business logic, you will not be able to get the subclass data members without down casting, so you need to either choose CRTP, or fat interface with virtual function to get subclass information or static/dynamic cast to get subclass pointer. CRTP is the fastest, fat interface or static casts is slower and uglier, dynamic cast is the slowest.
+4. In G++ and MSVC, even virtual function is not used in the derived class, it is still much slower than non virtual function and creates overhead.
