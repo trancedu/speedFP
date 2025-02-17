@@ -154,3 +154,9 @@ The benchmarks test the speed of pricing on 10,000 samples with 10,000 iteration
 | Static cast in subpricer        | 3.50416             | 2.699            | 2.48798                |
 
 This table provides a quick comparison of the performance across different platforms and optimization levels.
+
+# Some Conclusions
+These are just my observations, I may be wrong.
+1. Virtual function has significant overhead, compared to non virtual function or CRTP.
+2. Dynamic cast has even more overhead, if possible, maintain a enum of types and use static cast.
+3. Theoretically, in Object Oriented Design, data should be bundled with the business logic, so that down casting is not needed. If you have to separate data and business logic, you will not be able to get the subclass data members without down casting, so you need to either choose CRTP, or fat interface with virtual function to get subclass information or static/dynamic cast to get subclass pointer. CRTP is the fastest, fat interface or static casts is slower and uglier, dynamic cast is the slowest.
