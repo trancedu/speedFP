@@ -14,7 +14,7 @@ protected:
 class StockData : public Data {
 public:
     StockData() : priceFactor(1.2) {}
-    double getPrice() const override { return priceFactor * 1.1 + getCommonFactor(); }
+    double getPrice() const override { return getPriceFactor() * 1.1 + getCommonFactor(); }
     double getPriceFactor() const override { return priceFactor; }
 private:
     double priceFactor;
@@ -23,7 +23,7 @@ private:
 class OptionData : public Data {
 public:
     OptionData() : volatility(0.8) {}
-    double getPrice() const override { return volatility * 2.5 + getCommonFactor(); }
+    double getPrice() const override { return getVolatility() * 2.5 + getCommonFactor(); }
     double getVolatility() const override { return volatility; }
 private:
     double volatility;
