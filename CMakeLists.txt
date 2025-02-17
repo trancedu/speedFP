@@ -27,7 +27,9 @@ set(BENCHMARKS
     crtp_pricer
     dynamic_cast_pricer
     static_cast_pricer
-    derived_pricer
+    derived_pricer_no_virtual
+    derived_pricer_with_virtual_used
+    derived_pricer_with_virtual_unused
     dynamic_subpricer
     static_subpricer
 )

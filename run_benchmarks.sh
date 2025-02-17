@@ -11,7 +11,9 @@ cmake .. && make -j$(nproc)
 ./fat_interface_pricer
 ./crtp
 ./crtp_pricer
-./derived_pricer
+./derived_pricer_no_virtual
+./derived_pricer_with_virtual_used
+./derived_pricer_with_virtual_unused
 ./dynamic_cast_pricer
 ./static_cast_pricer
 ./dynamic_subpricer
