@@ -6,7 +6,7 @@ class OptionPricer;
 
 class Data {
 public:
-    virtual ~Data() = default;
+    // virtual ~Data() = default;
     // virtual double calculatePrice() const = 0;
     double getCommonFactor() const { return commonFactor; }
 protected:
